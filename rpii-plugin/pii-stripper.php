@@ -123,11 +123,16 @@ function admin_init(){
                 <fieldset>
                     <label>
                         <input class="settings-input" name="wpse61431_settings[wpse_array_field]" type="text" id="wpse_array_field" value="<?php echo (isset($options['wpse_array_field']) && $options['wpse_array_field'] != '') ? $options['wpse_array_field'] : ''; ?>" style="background: none; border-radius: 25px; padding-left: 15px; padding-right: 15px;" palceholder="'email', 'phone', 'dob'"/>
-                        <br />
+                        <br>
                         <br>
                         <span class="description">Sort each param by using comma 'param',</span>
                         <b>'email', 'phone', 'dob'</b>
                     </label>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    
                 </fieldset>
                 <br>
                 <br>
@@ -189,8 +194,9 @@ function wpse61431_admin_notices(){
 add_action ( 'wp_head', 'hook_inHeader' );
 function hook_inHeader() {
     $phpJsArrayConv = '';
+
     foreach( get_option('wpse61431_settings') as $key => $value) {
-        $phpJsArrayConv = 'var pageStripDictonary = ['.$value.'];';
+        $phpJsArrayConv = 'var pageStripDictonary = ['.$value.'];';        
     }
     
     echo "
@@ -198,11 +204,6 @@ function hook_inHeader() {
     ".$phpJsArrayConv."
             // get page URL
             var pageURL = window.location.href;
-            
-            // url params rulelist
-            //var pageStripDictonary = ['email', 'phone', 'dob2'];
-            //var pageStripDictonary = 
-            // TODO: setup if/else on url params is served, no need to loop if there is no query params
             
             // loop through list
             for (i = 0; i < pageStripDictonary.length; i++) {
@@ -225,17 +226,25 @@ function hook_inHeader() {
                 } else {
                     console.log('url already stripped');
                     console.log('data: '+localStorage.getItem(pageStripDictonary[i]));
-                    // TODO: push to DLV
                 }
             }
+            
+            // push data to DLV 
+            var arr = [];
+            for (i = 0; i < pageStripDictonary.length; i++) {
+                arr.push( localStorage.getItem(pageStripDictonary[i]));
+            }
+            
+            var jsonObj = {'event':'urlStrip'};
+            for (var i = 0 ; i < arr.length; i++) {
+                jsonObj[pageStripDictonary[i]] = arr[i];
+            }
+            
+            window.dataLayer = window.dataLayer || [];
+                window.dataLayer.push(jsonObj);
+            
         </script>
-    
-    
-    
-    
-    ";?>
-    <?php echo (isset($options['wpse_array_field']) && $options['wpse_array_field'] != '') ? $options['wpse_array_field'] : ''; ?>
-<?
+    ";
 }
 
 ?>
